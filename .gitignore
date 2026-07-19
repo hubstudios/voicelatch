@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build/icon.ico
+assets/icons/
+runtime/
+selftest-artifacts/
+*.log
+Thumbs.db

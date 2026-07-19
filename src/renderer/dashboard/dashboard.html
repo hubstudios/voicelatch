@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:" />
+<link rel="stylesheet" href="dashboard.css" />
+<title>VoiceLatch</title>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <img src="../../../assets/icons/icon-32.png" alt="" width="28" height="28" />
+      <span>VoiceLatch</span>
+    </div>
+    <nav>
+      <button class="nav-item active" data-page="home">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>
+        Home
+      </button>
+      <button class="nav-item" data-page="history">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        History
+      </button>
+      <button class="nav-item" data-page="dictionary">
+        <svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17h14"/><path d="M9 8h6"/></svg>
+        Dictionary
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.6M12 17.9v2.6M3.5 12h2.6M17.9 12h2.6M6 6l1.8 1.8M16.2 16.2 18 18M18 6l-1.8 1.8M7.8 16.2 6 18"/></svg>
+        Settings
+      </button>
+    </nav>
+    <div class="side-foot">
+      <div id="engine-chip" class="chip">engine: …</div>
+      <div id="version" class="dim"></div>
+    </div>
+  </aside>
+
+  <main id="content">
+    <!-- ============================ HOME ============================ -->
+    <section id="page-home" class="page active">
+      <h1 id="greeting">Welcome</h1>
+      <div id="onboarding" class="banner hidden">
+        <div class="banner-icon">🎤</div>
+        <div>
+          <b>Try your first dictation.</b>
+          <div>Click into any text field anywhere in Windows, hold
+            <kbd id="ob-hotkey">Right Ctrl</kbd>, speak, then release. Your words
+            will be typed at the cursor.</div>
+        </div>
+      </div>
+      <div class="cards" id="stat-cards">
+        <div class="card stat"><div class="stat-num" id="st-words">0</div><div class="stat-cap">words dictated</div></div>
+        <div class="card stat"><div class="stat-num" id="st-sessions">0</div><div class="stat-cap">dictations</div></div>
+        <div class="card stat"><div class="stat-num" id="st-wpm">0</div><div class="stat-cap">avg words/min</div></div>
+        <div class="card stat"><div class="stat-num" id="st-streak">0</div><div class="stat-cap">day streak</div></div>
+        <div class="card stat"><div class="stat-num" id="st-saved">0m</div><div class="stat-cap">time saved vs typing</div></div>
+      </div>
+      <div class="card">
+        <h3>Last 7 days</h3>
+        <canvas id="chart" height="120"></canvas>
+      </div>
+      <div class="card">
+        <h3>Recent dictations</h3>
+        <div id="recent-list" class="list"></div>
+      </div>
+    </section>
+
+    <!-- =========================== HISTORY ========================== -->
+    <section id="page-history" class="page">
+      <div class="page-head">
+        <h1>History</h1>
+        <div class="row-gap">
+          <input id="search" type="search" placeholder="Search dictations…" />
+          <button id="export-history" class="btn ghost">Export…</button>
+          <button id="clear-history" class="btn danger ghost">Clear all</button>
+        </div>
+      </div>
+      <div id="history-list" class="list"></div>
+    </section>
+
+    <!-- ========================== DICTIONARY ======================== -->
+    <section id="page-dictionary" class="page">
+      <h1>Dictionary</h1>
+      <div class="card">
+        <h3>Boost words</h3>
+        <p class="dim">Names and jargon the recognizer should favor — e.g. your name,
+          product names, technical terms.</p>
+        <div id="boost-chips" class="chips"></div>
+        <form id="boost-form" class="row-gap">
+          <input id="boost-input" placeholder="Add a word or phrase…" maxlength="60" />
+          <button class="btn" type="submit">Add</button>
+        </form>
+      </div>
+      <div class="card">
+        <h3>Auto-replacements</h3>
+        <p class="dim">Applied to every transcript. Example: “vox flow” → “VoiceLatch”.</p>
+        <div id="repl-rows"></div>
+        <form id="repl-form" class="row-gap">
+          <input id="repl-from" placeholder="When I say…" maxlength="60" />
+          <span class="dim">→</span>
+          <input id="repl-to" placeholder="Type this…" maxlength="120" />
+          <button class="btn" type="submit">Add</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- =========================== SETTINGS ========================= -->
+    <section id="page-settings" class="page">
+      <h1>Settings</h1>
+
+      <div class="card">
+        <h3>Dictation</h3>
+        <div class="setting-row">
+          <div><b>Hotkey</b><div class="dim">Hold (or tap, in toggle mode) to dictate</div></div>
+          <div class="row-gap">
+            <kbd id="hotkey-name">…</kbd>
+            <button id="hotkey-change" class="btn ghost">Change</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div><b>Mode</b><div class="dim">Hold: press &amp; hold, release to finish. Toggle: tap to start/stop.</div></div>
+          <select id="set-mode">
+            <option value="hold">Hold to talk</option>
+            <option value="toggle">Tap to toggle</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div><b>Microphone</b><div class="dim" id="mic-note">Device labels appear after first use</div></div>
+          <select id="set-mic"></select>
+        </div>
+        <div class="setting-row">
+          <div><b>Language</b><div class="dim" id="lang-note"></div></div>
+          <select id="set-lang"></select>
+        </div>
+        <div class="setting-row">
+          <div><b>Auto-finish after a pause</b><div class="dim">Toggle mode only: recording ends by itself ~2 s after you stop talking</div></div>
+          <input type="checkbox" id="set-autostop" class="switch" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Model</h3>
+        <p class="dim">Bigger models are more accurate but slower. Everything runs on this PC — nothing is uploaded.</p>
+        <div id="model-list"></div>
+        <div class="setting-row">
+          <div><b>Free memory when idle</b><div class="dim">Unload the model after 10 unused minutes (~300 MB); it re-warms on your next dictation (~1-2 s once)</div></div>
+          <input type="checkbox" id="set-idleunload" class="switch" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Output</h3>
+        <div class="setting-row">
+          <div><b>Insert method</b><div class="dim">Paste is fast and reliable; Type presses each key (for apps that block paste)</div></div>
+          <select id="set-inject">
+            <option value="paste">Paste (recommended)</option>
+            <option value="type">Type each character</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div><b>Restore clipboard after paste</b><div class="dim">Put your previous clipboard back after inserting</div></div>
+          <input type="checkbox" id="set-restore" class="switch" />
+        </div>
+        <div class="setting-row">
+          <div><b>Remove filler words</b><div class="dim">Strips “um”, “uh”, “erm”…</div></div>
+          <input type="checkbox" id="set-fillers" class="switch" />
+        </div>
+        <div class="setting-row">
+          <div><b>Spoken commands</b><div class="dim">Say “new line”, “new paragraph”, or “bullet point” after a sentence to format</div></div>
+          <input type="checkbox" id="set-commands" class="switch" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>AI edits <span class="badge copied">cloud · optional</span></h3>
+        <p class="dim">Off by default. When on, the finished <b>text</b> of each dictation
+          (never your audio) is sent to Groq’s free AI service, which fixes grammar and
+          polishes it before it is typed. If the service is slow or down, your raw
+          transcript is typed instead — a dictation is never lost.
+          <a href="#" id="ai-key-link">Get a free API key (console.groq.com)</a></p>
+        <div class="setting-row">
+          <div><b>Rewrite with AI</b><div class="dim" id="ai-enable-note">Needs the API key below</div></div>
+          <input type="checkbox" id="set-ai" class="switch" />
+        </div>
+        <div class="setting-row">
+          <div><b>API key</b><div class="dim">Stored encrypted on this PC; only ever sent to the provider</div></div>
+          <input type="password" id="set-ai-key" placeholder="gsk_…" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="setting-row">
+          <div><b>Model</b><div class="dim">70B is smarter; 8B answers faster</div></div>
+          <select id="set-ai-model"></select>
+        </div>
+        <div class="setting-row">
+          <div><b>Style</b><div class="dim" id="ai-style-hint"></div></div>
+          <select id="set-ai-style"></select>
+        </div>
+        <div class="setting-row">
+          <div><b>Connection</b><div class="dim" id="ai-test-note">Sends a one-word test request</div></div>
+          <button id="ai-test" class="btn ghost">Test</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>General</h3>
+        <div class="setting-row">
+          <div><b>Dictation enabled</b></div>
+          <input type="checkbox" id="set-enabled" class="switch" />
+        </div>
+        <div class="setting-row">
+          <div><b>Sounds</b><div class="dim">Soft tick when recording starts/stops</div></div>
+          <input type="checkbox" id="set-sounds" class="switch" />
+        </div>
+        <div class="setting-row">
+          <div><b>Start with Windows</b></div>
+          <input type="checkbox" id="set-login" class="switch" />
+        </div>
+        <div class="setting-row">
+          <div><b>Auto-delete history</b><div class="dim">Dictations older than this are removed automatically</div></div>
+          <select id="set-retention">
+            <option value="0">Keep forever</option>
+            <option value="7">After 7 days</option>
+            <option value="30">After 30 days</option>
+            <option value="90">After 90 days</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>About</h3>
+        <div class="setting-row"><div>Version</div><div id="about-version" class="dim"></div></div>
+        <div class="setting-row"><div>Engine</div><div id="about-engine" class="dim"></div></div>
+        <div class="setting-row"><div>Data folder</div><div id="about-data" class="dim mono"></div></div>
+        <div class="setting-row">
+          <div><b>Logs</b><div class="dim">For troubleshooting failed transcriptions</div></div>
+          <button id="open-logs" class="btn ghost">View logs</button>
+        </div>
+        <p class="dim">VoiceLatch keeps everything on this PC: audio is transcribed locally and
+        deleted immediately; history lives in your data folder. Uninstalling keeps the data
+        folder unless you delete it yourself.</p>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast"></div>
+<script src="dashboard.js"></script>
+</body>
+</html>

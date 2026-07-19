@@ -1,0 +1,56 @@
+{
+  "name": "voicelatch",
+  "productName": "VoiceLatch",
+  "version": "1.2.1",
+  "description": "Local, private voice dictation for Windows — hold a key, speak, and your words are typed into any app.",
+  "main": "src/main/main.js",
+  "author": "Naveed",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "setup": "node scripts/setup.js",
+    "selftest": "node scripts/selftest.js",
+    "stage": "node scripts/stage-pack.js",
+    "dist": "node scripts/stage-pack.js && electron-builder --win nsis dir"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.4"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.naveed.voicelatch",
+    "productName": "VoiceLatch",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "npmRebuild": false,
+    "asarUnpack": [
+      "node_modules/uiohook-napi/**"
+    ],
+    "extraResources": [
+      { "from": "runtime/pack/bin", "to": "bin" },
+      { "from": "runtime/pack/models", "to": "models" }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": false,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "VoiceLatch-Setup-${version}.${ext}"
+    }
+  }
+}
