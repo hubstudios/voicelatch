@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/icon.ico
+assets/icons/
+runtime/
+selftest-artifacts/
+*.log
+Thumbs.db
+
+# internal working docs — local only
+TODOS.md
+PLAN.md

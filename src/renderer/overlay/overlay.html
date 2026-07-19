@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'" />
+<link rel="stylesheet" href="overlay.css" />
+<title>VoiceLatch overlay</title>
+</head>
+<body>
+  <div id="pill" class="hidden" role="status" aria-live="polite">
+    <div id="dot"></div>
+    <canvas id="wave" width="150" height="36"></canvas>
+    <div id="spinner"><span></span><span></span><span></span></div>
+    <div id="icon"></div>
+    <div id="label"></div>
+    <div id="timer"></div>
+  </div>
+  <script src="overlay.js"></script>
+</body>
+</html>
